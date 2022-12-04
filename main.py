@@ -53,11 +53,10 @@ def getScreenersOverviewData(exchange: str):
         headers.append(td.text)
 
     results = []
-    row_dict = {}
 
     content_rows = soup.select('.table-light tr[valign="top"]')
-
     for row in content_rows:
+        row_dict = {}
         td_list = row.find_all('td')
 
         for i in range(len(td_list)):
@@ -65,21 +64,5 @@ def getScreenersOverviewData(exchange: str):
 
         results.append(row_dict)
 
-    print(results)
-
-    # table_rows = soup.select('.snapshot-table2 .table-dark-row')
-    # temp_list = []
-    # result_dict = {}
-
-    # for row in table_rows:
-    #     row_cells = row.find_all('td')
-
-    #     for i in range(len(row_cells)):
-    #         text = row_cells[i].text
-    #         temp_list.append(text)
-
-    #         if i % 2 > 0:
-    #             result_dict[temp_list[0]] = temp_list[1]
-    #             temp_list.clear()
-
+    result_dict['results'] = results
     return result_dict
