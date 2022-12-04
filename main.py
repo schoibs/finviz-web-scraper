@@ -52,7 +52,20 @@ def getScreenersOverviewData(exchange: str):
     for td in headers_row:
         headers.append(td.text)
 
-    print(headers)
+    results = []
+    row_dict = {}
+
+    content_rows = soup.select('.table-light tr[valign="top"]')
+
+    for row in content_rows:
+        td_list = row.find_all('td')
+
+        for i in range(len(td_list)):
+            row_dict[headers[i]] = td_list[i].text
+
+        results.append(row_dict)
+
+    print(results)
 
     # table_rows = soup.select('.snapshot-table2 .table-dark-row')
     # temp_list = []
@@ -68,4 +81,5 @@ def getScreenersOverviewData(exchange: str):
     #         if i % 2 > 0:
     #             result_dict[temp_list[0]] = temp_list[1]
     #             temp_list.clear()
+
     return result_dict
