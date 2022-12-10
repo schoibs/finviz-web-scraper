@@ -52,7 +52,9 @@ def getScreenersOverviewData(exchange: str, page:int = 1):
     headers = []
 
     pagination = soup.select('.screener_pagination a')
-    total_page = pagination[-2].text
+    total_page = pagination[-1].text
+    if total_page == 'next':
+        total_page = pagination[-2].text
 
     headers_row = soup.select('.table-light tr .table-top.cursor-pointer')
     for td in headers_row:
