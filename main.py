@@ -181,7 +181,7 @@ def getScreenerOwnershipData(exchange: str, page:int = 1, market_cap='', sector=
         page = (page - 1) * 20 + 1
 
     # extract the website html content
-    url = f'https://finviz.com/screener.ashx?v=161&f=exch_{exchange.lower()[:4]},cap_{market_cap},sec_{sector},idx_{index},targetprice_{target_price},fa_pe_{p_e}&r={page}'
+    url = f'https://finviz.com/screener.ashx?v=131&f=exch_{exchange.lower()[:4]},cap_{market_cap},sec_{sector},idx_{index},targetprice_{target_price},fa_pe_{p_e}&r={page}'
     response = scraper.get(url)
     soup = BeautifulSoup(response.content, features="html.parser")
 
