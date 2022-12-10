@@ -259,3 +259,47 @@ def getScreenerPerformanceData(exchange: str, page:int = 1, market_cap='', secto
     output['total_page'] = total_page
     output['results'] = results
     return output
+
+@app.get("/screener/technical/{exchange}/{page}")
+def getScreenerTechnicalData(exchange: str, page:int = 1, market_cap='', sector='', index='', target_price='', p_e=''):
+    output = {}
+
+    # get the correct page representation
+    if page > 1:
+        page = (page - 1) * 20 + 1
+
+    # extract the website html content
+    url = f'https://finviz.com/screener.ashx?v=171&f=exch_{exchange.lower()[:4]},cap_{market_cap},sec_{sector},idx_{index},targetprice_{target_price},fa_pe_{p_e}&r={page}'
+    response = scraper.get(url)
+    soup = BeautifulSoup(response.content, features="html.parser")
+
+    # extract table headers
+    headers = []
+    headers_row = soup.select('.table-light tr .table-top.cursor-pointer')
+    for td in headers_row:
+        headers.append(td.text)
+
+    # extract table content by looping through each table row
+    results = []
+    content_rows = soup.select('.table-light tr[valign="top"]')
+    for row in content_rows:
+        row_dict = {}
+        td_list = row.find_all('td')
+
+        for i in range(len(td_list)):
+            row_dict[headers[i]] = td_list[i].text
+
+        results.append(row_dict)
+
+    # get total pages
+    total_page = 0
+    if len(headers) > 0:
+        pagination = soup.select('.screener_pagination a')
+        total_page = pagination[-1].text
+
+        if total_page == 'next':
+            total_page = pagination[-2].text
+
+    output['total_page'] = total_page
+    output['results'] = results
+    return output
