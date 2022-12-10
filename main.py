@@ -15,14 +15,16 @@ def getData():
 @app.get("/stocks/{ticker}")
 def getIndividualStocksData(ticker: str):
 
+    output = {}
+
+    # extract the website html content
     url = f'https://finviz.com/quote.ashx?t={ticker}'
     response = scraper.get(url)
     soup = BeautifulSoup(response.content, features="html.parser")
 
-    table_rows = soup.select('.snapshot-table2 .table-dark-row')
+    # extract information from table by looping through each table row
     temp_list = []
-    result_dict = {}
-
+    table_rows = soup.select('.snapshot-table2 .table-dark-row')
     for row in table_rows:
         row_cells = row.find_all('td')
 
@@ -31,37 +33,33 @@ def getIndividualStocksData(ticker: str):
             temp_list.append(text)
 
             if i % 2 > 0:
-                result_dict[temp_list[0]] = temp_list[1]
+                output[temp_list[0]] = temp_list[1]
                 temp_list.clear()
 
-    return result_dict
+    return output
 
 
 @app.get("/screener/overview/{exchange}/{page}")
-def getScreenersOverviewData(exchange: str, page:int = 1):
-    # exchange = 'AMEX' | 'NYSE' | 'NASDAQ'
+def getScreenersOverviewData(exchange: str, page:int = 1, market_cap='', sector='', index='', target_price='', p_e=''):
+    output = {}
 
+    # get the correct page representation
     if page > 1:
         page = (page - 1) * 20 + 1
 
-    url = f'https://finviz.com/screener.ashx?v=111&f=exch_{exchange.lower()[:4]}&r={page}'
+    # extract the website html content
+    url = f'https://finviz.com/screener.ashx?v=111&f=exch_{exchange.lower()[:4]},cap_{market_cap},sec_{sector},idx_{index},targetprice_{target_price},fa_pe_{p_e}&ft=4&r={page}'
     response = scraper.get(url)
     soup = BeautifulSoup(response.content, features="html.parser")
 
-    result_dict = {}
+    # extract table headers
     headers = []
-
-    pagination = soup.select('.screener_pagination a')
-    total_page = pagination[-1].text
-    if total_page == 'next':
-        total_page = pagination[-2].text
-
     headers_row = soup.select('.table-light tr .table-top.cursor-pointer')
     for td in headers_row:
         headers.append(td.text)
 
+    # extract table content by looping through each table row
     results = []
-
     content_rows = soup.select('.table-light tr[valign="top"]')
     for row in content_rows:
         row_dict = {}
@@ -72,6 +70,15 @@ def getScreenersOverviewData(exchange: str, page:int = 1):
 
         results.append(row_dict)
 
-    result_dict['total_page'] = total_page
-    result_dict['results'] = results
-    return result_dict
+    # get total pages
+    total_page = 0
+    if len(headers) > 0:
+        pagination = soup.select('.screener_pagination a')
+        total_page = pagination[-1].text
+
+        if total_page == 'next':
+            total_page = pagination[-2].text
+
+    output['total_page'] = total_page
+    output['results'] = results
+    return output
