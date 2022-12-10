@@ -37,16 +37,22 @@ def getIndividualStocksData(ticker: str):
     return result_dict
 
 
-@app.get("/screener/overview/{exchange}")
-def getScreenersOverviewData(exchange: str):
+@app.get("/screener/overview/{exchange}/{page}")
+def getScreenersOverviewData(exchange: str, page:int = 1):
     # exchange = 'AMEX' | 'NYSE' | 'NASDAQ'
 
-    url = f'https://finviz.com/screener.ashx?v=111&f=exch_{exchange.lower()[:4]}'
+    if page > 1:
+        page = (page - 1) * 20 + 1
+
+    url = f'https://finviz.com/screener.ashx?v=111&f=exch_{exchange.lower()[:4]}&r={page}'
     response = scraper.get(url)
     soup = BeautifulSoup(response.content, features="html.parser")
 
     result_dict = {}
     headers = []
+
+    pagination = soup.select('.screener_pagination a')
+    total_page = pagination[-2].text
 
     headers_row = soup.select('.table-light tr .table-top.cursor-pointer')
     for td in headers_row:
@@ -64,5 +70,6 @@ def getScreenersOverviewData(exchange: str):
 
         results.append(row_dict)
 
+    result_dict['total_page'] = total_page
     result_dict['results'] = results
     return result_dict
