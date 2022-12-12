@@ -128,6 +128,7 @@ def getScreenerValuationData(exchange: str, page:int = 1, market_cap='', sector=
     output['results'] = results
     return output
 
+
 @app.get("/screener/financial/{exchange}/{page}")
 def getScreenerFinancialData(exchange: str, page:int = 1, market_cap='', sector='', index='', target_price='', p_e=''):
     output = {}
@@ -171,6 +172,7 @@ def getScreenerFinancialData(exchange: str, page:int = 1, market_cap='', sector=
     output['total_page'] = total_page
     output['results'] = results
     return output
+
 
 @app.get("/screener/ownership/{exchange}/{page}")
 def getScreenerOwnershipData(exchange: str, page:int = 1, market_cap='', sector='', index='', target_price='', p_e=''):
@@ -216,6 +218,7 @@ def getScreenerOwnershipData(exchange: str, page:int = 1, market_cap='', sector=
     output['results'] = results
     return output
 
+
 @app.get("/screener/performance/{exchange}/{page}")
 def getScreenerPerformanceData(exchange: str, page:int = 1, market_cap='', sector='', index='', target_price='', p_e=''):
     output = {}
@@ -259,6 +262,7 @@ def getScreenerPerformanceData(exchange: str, page:int = 1, market_cap='', secto
     output['total_page'] = total_page
     output['results'] = results
     return output
+
 
 @app.get("/screener/technical/{exchange}/{page}")
 def getScreenerTechnicalData(exchange: str, page:int = 1, market_cap='', sector='', index='', target_price='', p_e=''):
